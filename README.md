@@ -1,26 +1,70 @@
 # toolchain
 
-> Personal CLI that brings the `makursi/toolbox` toolchain (Oxlint + Oxfmt + shared
-> TypeScript config) to any project — either temporarily via `npx toolchain <cmd>`,
-> or permanently by installing the package and running `toolchain init`.
+> Personal CLI that brings the `makursi/toolbox` toolchain — **Oxlint + Oxfmt + a
+> shared strict TypeScript config** — to any project. Two ways to use it:
+> temporarily via `npx`, or permanently by installing and running `toolchain init`.
 
-## Status
+## Why
 
-Spec in progress — see the project's issue tracker. Not yet published to npm.
+`makursi/toolbox` is a pnpm + Turborepo monorepo with a carefully chosen dev
+toolchain (see its ADR-0002: Oxlint + Oxfmt, deliberately **no** ESLint/Prettier
+in user projects). That toolchain was not reusable: the repo is private and
+all-rights-reserved, with no "add to my project" mechanism. `toolchain` fixes
+that — the configs are re-implemented from the **official tool schemas**, never
+copied from the toolbox repo.
 
-## Planned commands
+## Install
 
-- `toolchain init` — scaffold the toolchain into the current project (config files,
-  devDependencies, npm scripts; `--dry-run`, `--yes`, idempotent).
-- `toolchain lint` / `toolchain typecheck` / `toolchain fmt` — read-only execution via
-  `npx`, no install needed (beyond the npx cache).
+```bash
+# permanent — adds the toolchain to your project
+npm i -D toolchain
+toolchain init
 
-## Decisions snapshot
+# temporary — no install needed
+npx toolchain lint
+```
 
-- Toolchain for downstream projects: **Oxlint + Oxfmt** (no ESLint/Prettier in user
-  projects) — faithful to the toolbox ADR-0002.
-- The CLI's own codebase **dogfoods `@antfu/eslint-config`**.
-- CLI: Node + TypeScript, ESM, `cac` + `clack` + `@antfu/install-pkg`, bundled with `tsdown`.
-- Engine floors: CLI `>=18.18`; projects scaffolded by `init` get `>=22.22.1`.
-- License-safe: config templates are re-implemented from official schemas, never
-  copied verbatim from the toolbox repo (which is all-rights-reserved).
+## Commands
+
+| Command | Description |
+| --- | --- |
+| `toolchain init` | Add the toolchain to the current project (config files, scripts, devDependencies). `--dry-run` to preview, `-y/--yes` to skip prompts. Idempotent. |
+| `toolchain lint` | Run `oxlint` in the current project (read-only). |
+| `toolchain typecheck` | Run `tsc --noEmit` in the current project (read-only). |
+| `toolchain fmt` | Run `oxfmt` in the current project (read-only). |
+
+## What `toolchain init` does
+
+- Writes `.oxlintrc.json` (base rules; framework plugins + browser env when it
+  detects Next.js / React), `.oxfmtrc.json`, a strict `tsconfig.json` (skipped
+  for Next.js, which owns its own), and `.gitattributes` (`eol=lf` so Oxfmt's
+  LF enforcement never fights CRLF).
+- Adds npm scripts: `lint`, `lint:fix`, `typecheck`, `fmt`, `fmt:check`.
+- Adds devDependencies pinned to the toolbox catalog, with `typescript` ⇄
+  `oxlint-tsgolint` **exactly pinned** (they move together).
+- Declares `engines.node >=22.22.1` (covers lint-staged 17 + pnpm 12 floors).
+- Wires `simple-git-hooks` + `lint-staged` (pre-commit runs `lint-staged` via
+  your detected package manager: pnpm / npm / yarn / bun).
+
+## Requirements
+
+- Node >= 18.18 to run the CLI itself.
+- Node >= 22.22.1 in projects that adopt the toolchain (declared automatically
+  by `init`).
+
+## Development
+
+```bash
+pnpm install
+pnpm test        # Vitest — the planner (single test seam) fixture matrix
+pnpm lint        # oxlint --type-aware (CLI dogfoods the oxlint toolchain)
+pnpm typecheck   # tsc --noEmit (TypeScript 7)
+pnpm build       # tsdown → dist/index.mjs (pure ESM)
+```
+
+The CLI's own codebase follows antfu-style conventions (`@antfu/eslint-config`)
+for linting; the toolchain it *installs into user projects* is Oxlint + Oxfmt.
+
+## License
+
+MIT

@@ -1,0 +1,62 @@
+{
+  "name": "toolchain",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Personal CLI that brings the makursi/toolbox toolchain (Oxlint + Oxfmt + shared TypeScript config) to any project — via npx or `toolchain init`.",
+  "license": "MIT",
+  "private": false,
+  "bin": {
+    "toolchain": "dist/index.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20.12.0"
+  },
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "lint": "oxlint --type-aware",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc --noEmit",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "@antfu/install-pkg": "^2.1.0",
+    "@clack/prompts": "^1.8.1",
+    "cac": "^7.0.0",
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.5.1",
+    "@types/node": "^24.0.0",
+    "eslint": "^9.10.0",
+    "lint-staged": "^17.5.1",
+    "oxfmt": "^0.67.0",
+    "oxlint": "^1.82.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "simple-git-hooks": "^2.14.0",
+    "tsdown": "^0.23.0",
+    "typescript": "7.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.0"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}": [
+      "oxlint --fix",
+      "oxfmt --no-error-on-unmatched-pattern"
+    ],
+    "*.{json,jsonc,css,md,mdx,yml,yaml,toml,html}": [
+      "oxfmt --no-error-on-unmatched-pattern"
+    ]
+  }
+}

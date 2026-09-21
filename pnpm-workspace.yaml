@@ -1,0 +1,4 @@
+# Single-package pnpm project.
+# allowBuilds: let simple-git-hooks run its postinstall to install git hooks.
+allowBuilds:
+  simple-git-hooks: true

@@ -15,4 +15,8 @@ next-env.d.ts
 # misc
 *.log
 .DS_Store
+
+# pnpm project-local store (this environment keeps it inside the project)
+.pnpm-store/
 .spec-issue-body.md
+
