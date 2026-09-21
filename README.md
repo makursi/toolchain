@@ -1,30 +1,50 @@
-# toolchain (published as @choriakiinwel/toolchain)
+# @choriakiinwel/toolchain
 
-> Personal CLI that brings the `makursi/toolbox` toolchain — **Oxlint + Oxfmt + a
-> shared strict TypeScript config** — to any project. Two ways to use it:
-> temporarily via `npx`, or permanently by installing and running `toolchain init`.
+[![npm](https://img.shields.io/npm/v/@choriakiinwel/toolchain?color=444&label=)](https://npmjs.com/package/@choriakiinwel/toolchain)
 
-## Why
+- Bring the `makursi/toolbox` toolchain — **Oxlint + Oxfmt + a strict TypeScript config** — to any project in one command
+- Two ways to use it: temporarily via `npx`, or permanently with `toolchain init`
+- Auto-detects your package manager (`pnpm` / `npm` / `yarn` / `bun`) and framework (Next.js / React / plain TS)
+- Idempotent: re-running `init` never clobbers your existing configs
+- `--dry-run` preview before anything is written, `-y/--yes` to skip prompts
+- Cross-platform (Windows / macOS / Linux), pure ESM, single binary
+- License-safe configs — re-implemented from the official tool schemas, never copied from the toolbox repo
 
-`makursi/toolbox` is a pnpm + Turborepo monorepo with a carefully chosen dev
-toolchain (see its ADR-0002: Oxlint + Oxfmt, deliberately **no** ESLint/Prettier
-in user projects). That toolchain was not reusable: the repo is private and
-all-rights-reserved, with no "add to my project" mechanism. `toolchain` fixes
-that — the configs are re-implemented from the **official tool schemas**, never
-copied from the toolbox repo.
+> [!WARNING]
+> This is a **personal CLI** with strong opinions. It installs the exact toolchain
+> I use for my own projects: Oxlint + Oxfmt (deliberately **no** ESLint or Prettier
+> in downstream projects, per the toolbox's ADR-0002) with `typescript` ⇄
+> `oxlint-tsgolint` **exactly pinned**.
+>
+> If you want more control over the rules, always feel free to fork it. Thanks!
 
-## Install
+## Usage
+
+### Temporary (no install)
 
 ```bash
-# permanent — adds the toolchain to your project
-npm i -D @choriakiinwel/toolchain
-toolchain init
-
-# temporary — no install needed
 npx @choriakiinwel/toolchain lint
+npx @choriakiinwel/toolchain typecheck
 ```
 
-## Commands
+Nothing to install, nothing to configure — it runs the tools against the current project and forwards the exit code.
+
+### Install
+
+For a permanent setup, install the package and run `init` once:
+
+```bash
+npm i -D @choriakiinwel/toolchain
+toolchain init
+```
+
+Or preview first:
+
+```bash
+toolchain init --dry-run
+```
+
+### Commands
 
 | Command               | Description                                                                                                                                        |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -32,6 +52,11 @@ npx @choriakiinwel/toolchain lint
 | `toolchain lint`      | Run `oxlint` in the current project (read-only).                                                                                                   |
 | `toolchain typecheck` | Run `tsc --noEmit` in the current project (read-only).                                                                                             |
 | `toolchain fmt`       | Run `oxfmt` in the current project (read-only).                                                                                                    |
+
+> [!TIP]
+> The read-only commands (`lint` / `typecheck` / `fmt`) prefer the project's
+> locally installed tools and fall back to `npx` — so `npx @choriakiinwel/toolchain <cmd>`
+> works even before the toolchain is installed.
 
 ## What `toolchain init` does
 
@@ -52,6 +77,14 @@ npx @choriakiinwel/toolchain lint
 - Node >= 22.22.1 in projects that adopt the toolchain (declared automatically
   by `init`).
 
+## Customization
+
+Everything `init` writes is a plain file you can edit afterwards. The toolchain
+is deliberately minimal — two config files (`.oxlintrc.json`, `.oxfmtrc.json`),
+one `tsconfig.json`, one `.gitattributes`, plus the scripts and devDeps in your
+`package.json`. Change any of them directly; re-running `init` never overwrites
+your edits.
+
 ## Development
 
 ```bash
@@ -65,24 +98,62 @@ pnpm build       # tsdown → dist/index.mjs (pure ESM)
 The CLI's own codebase follows antfu-style conventions (`@antfu/eslint-config`)
 for linting; the toolchain it _installs into user projects_ is Oxlint + Oxfmt.
 
-## Release
+## Versioning Policy
 
-Publishing is fully automated via GitHub Actions — no manual `npm publish`
-needed, and no OTP involved.
+This project follows [Semantic Versioning](https://semver.org/) for releases. Since this is a personal CLI that embeds config templates and opinions, we don't treat template tweaks as breaking changes.
 
-1. Set the **`NPM_TOKEN`** secret on the repo (`Settings → Secrets and
-   variables → Actions`): an npm **granular access token for
-   `@choriakiinwel/toolchain` with bypass-2FA** (token type "Publish").
-2. Tag a release (the tag version must match `package.json` version):
+### Changes Considered as Breaking Changes
 
-   ```bash
-   git tag v0.0.1
-   git push origin v0.0.1
-   ```
+- Node.js version requirement changes
+- Huge refactors that might break the CLI
+- A tool the toolchain installs made a major change that affects the generated configs
+- Changes that affect most user projects
 
-   The `Release` workflow runs the full quality gates first, then publishes to
-   npm with `--provenance` (signature-backed attestation).
+### Changes Considered as Non-breaking Changes
+
+- Template/rule tweaks inside `init`
+- Version bumps of installed toolchain dependencies
+- New read-only commands
+
+## Badge
+
+If you are using this toolchain in your project, here is the badge you can use:
+
+```md
+[![toolchain](https://img.shields.io/npm/v/@choriakiinwel/toolchain?color=444&label=toolchain)](https://npmjs.com/package/@choriakiinwel/toolchain)
+```
+
+## FAQ
+
+### ESLint? Prettier?
+
+No — downstream projects get **Oxlint + Oxfmt** only, following the toolbox's
+[ADR-0002](https://github.com/makursi/toolbox/blob/main/docs/adr/0002-oxlint-oxfmt-over-eslint-prettier.md).
+The CLI's _own_ codebase uses `@antfu/eslint-config` (antfu-style) for linting,
+which is a separate decision from what `init` installs into user projects.
+
+### Why exactly-pinned `typescript` ⇄ `oxlint-tsgolint`?
+
+Oxlint's type-aware linting is powered by typescript-go; `oxlint-tsgolint`
+tracks a specific TypeScript release, so the two must move together. The
+toolchain pins both exactly (`7.0.2` / `7.0.2001`) to avoid a version-drift
+surprise mid-install.
+
+### How do I update the toolchain?
+
+`npm i -D @choriakiinwel/toolchain@latest`, then re-run `toolchain init` — it
+detects what is already there and only adds what is missing.
+
+### I prefer a different rule.
+
+`toolchain init` writes plain files. Edit `.oxlintrc.json` / `.oxfmtrc.json`
+directly, or fork the repo and maintain your own copy.
+
+## Check Also
+
+- [makursi/toolbox](https://github.com/makursi/toolbox) — the monorepo this toolchain comes from
+- [antfu/eslint-config](https://github.com/antfu/eslint-config) — inspiration for the CLI's own code style
 
 ## License
 
-MIT
+[MIT](./LICENSE) License &copy; 2026 Choriakiinwei

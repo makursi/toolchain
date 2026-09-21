@@ -10,10 +10,10 @@
   "files": [
     "dist"
   ],
+  "type": "module",
   "publishConfig": {
     "access": "public"
   },
-  "type": "module",
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
