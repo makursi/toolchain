@@ -20,3 +20,5 @@ next-env.d.ts
 .pnpm-store/
 .spec-issue-body.md
 
+.npm-cache/
+
