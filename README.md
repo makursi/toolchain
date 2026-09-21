@@ -1,4 +1,4 @@
-# toolchain
+# toolchain (published as @choriakiinwel/toolchain)
 
 > Personal CLI that brings the `makursi/toolbox` toolchain — **Oxlint + Oxfmt + a
 > shared strict TypeScript config** — to any project. Two ways to use it:
@@ -17,11 +17,11 @@ copied from the toolbox repo.
 
 ```bash
 # permanent — adds the toolchain to your project
-npm i -D toolchain
+npm i -D @choriakiinwel/toolchain
 toolchain init
 
 # temporary — no install needed
-npx toolchain lint
+npx @choriakiinwel/toolchain lint
 ```
 
 ## Commands

@@ -21,7 +21,7 @@ jobs:
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 12.3.4
+          version: 11.9.0
 
       - name: Set up Node
         uses: actions/setup-node@v4
