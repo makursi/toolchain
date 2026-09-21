@@ -18,9 +18,5 @@
     "noEmit": true,
     "incremental": true
   },
-  "include": [
-    "src",
-    "tsdown.config.ts",
-    "vitest.config.ts"
-  ]
+  "include": ["src", "tsdown.config.ts", "vitest.config.ts"]
 }

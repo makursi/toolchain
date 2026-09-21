@@ -26,12 +26,12 @@ npx @choriakiinwel/toolchain lint
 
 ## Commands
 
-| Command | Description |
-| --- | --- |
-| `toolchain init` | Add the toolchain to the current project (config files, scripts, devDependencies). `--dry-run` to preview, `-y/--yes` to skip prompts. Idempotent. |
-| `toolchain lint` | Run `oxlint` in the current project (read-only). |
-| `toolchain typecheck` | Run `tsc --noEmit` in the current project (read-only). |
-| `toolchain fmt` | Run `oxfmt` in the current project (read-only). |
+| Command               | Description                                                                                                                                        |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `toolchain init`      | Add the toolchain to the current project (config files, scripts, devDependencies). `--dry-run` to preview, `-y/--yes` to skip prompts. Idempotent. |
+| `toolchain lint`      | Run `oxlint` in the current project (read-only).                                                                                                   |
+| `toolchain typecheck` | Run `tsc --noEmit` in the current project (read-only).                                                                                             |
+| `toolchain fmt`       | Run `oxfmt` in the current project (read-only).                                                                                                    |
 
 ## What `toolchain init` does
 
@@ -63,7 +63,7 @@ pnpm build       # tsdown → dist/index.mjs (pure ESM)
 ```
 
 The CLI's own codebase follows antfu-style conventions (`@antfu/eslint-config`)
-for linting; the toolchain it *installs into user projects* is Oxlint + Oxfmt.
+for linting; the toolchain it _installs into user projects_ is Oxlint + Oxfmt.
 
 ## License
 

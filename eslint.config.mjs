@@ -1,21 +1,17 @@
-import antfu from '@antfu/eslint-config'
+import antfu from "@antfu/eslint-config";
 
 export default antfu(
   {
-    type: 'lib',
+    type: "lib",
     typescript: {
-      tsconfigPath: 'tsconfig.json',
+      tsconfigPath: "tsconfig.json",
     },
-    ignores: [
-      'dist',
-      'node_modules',
-      '*.md',
-    ],
+    ignores: ["dist", "node_modules", "*.md"],
   },
   {
-    files: ['**/*.ts'],
+    files: ["**/*.ts"],
     rules: {
-      'no-console': 'warn',
+      "no-console": "warn",
     },
   },
-)
+);
