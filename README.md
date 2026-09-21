@@ -65,6 +65,24 @@ pnpm build       # tsdown → dist/index.mjs (pure ESM)
 The CLI's own codebase follows antfu-style conventions (`@antfu/eslint-config`)
 for linting; the toolchain it _installs into user projects_ is Oxlint + Oxfmt.
 
+## Release
+
+Publishing is fully automated via GitHub Actions — no manual `npm publish`
+needed, and no OTP involved.
+
+1. Set the **`NPM_TOKEN`** secret on the repo (`Settings → Secrets and
+   variables → Actions`): an npm **granular access token for
+   `@choriakiinwel/toolchain` with bypass-2FA** (token type "Publish").
+2. Tag a release (the tag version must match `package.json` version):
+
+   ```bash
+   git tag v0.0.1
+   git push origin v0.0.1
+   ```
+
+   The `Release` workflow runs the full quality gates first, then publishes to
+   npm with `--provenance` (signature-backed attestation).
+
 ## License
 
 MIT
